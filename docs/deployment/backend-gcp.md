@@ -3,6 +3,8 @@
 The Waywise backend is the `api/` package. It is designed for Cloud Run with Cloud SQL for
 PostgreSQL and PostGIS.
 
+For the full live-demo GCP deployment sequence, use `docs/deployment/live-demo-gcp.md`.
+
 ## Prerequisites
 
 - A GCP project with Cloud Run and Cloud SQL enabled.
