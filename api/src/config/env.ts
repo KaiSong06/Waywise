@@ -5,6 +5,9 @@ export interface ApiConfig {
   host: string;
   port: number;
   databaseUrl?: string;
+  databaseUser?: string;
+  databasePassword?: string;
+  databaseName?: string;
   cloudSqlConnectionName?: string;
   databaseSocketPath?: string;
   corsOrigins: string[];
@@ -26,6 +29,9 @@ export function loadEnv(env: RawEnv = process.env): ApiConfig {
     host: env.HOST ?? "0.0.0.0",
     port: parseNumber("PORT", env.PORT, { defaultValue: 8080, min: 1, max: 65535 }),
     databaseUrl: emptyToUndefined(env.DATABASE_URL),
+    databaseUser: emptyToUndefined(env.DB_USER),
+    databasePassword: emptyToUndefined(env.DB_PASSWORD),
+    databaseName: emptyToUndefined(env.DB_NAME),
     cloudSqlConnectionName: emptyToUndefined(env.CLOUD_SQL_CONNECTION_NAME),
     databaseSocketPath: emptyToUndefined(env.DATABASE_SOCKET_PATH),
     corsOrigins: parseCsv(env.CORS_ORIGINS, defaultCorsOrigins),
