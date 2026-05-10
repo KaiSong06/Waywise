@@ -37,9 +37,17 @@ Run migrations explicitly as a release step:
 npm --prefix api run migrate
 ```
 
-Do not rely on Cloud Run app startup to mutate schema. Startup may run multiple instances and
-should stay focused on serving traffic. Demo data seeding is separate and controlled by
-`AUTO_SEED_DEMO`.
+For production images and Cloud Run Jobs, build the API and run the compiled migration entrypoint:
+
+```bash
+npm --prefix api run build
+npm --prefix api run migrate:prod
+```
+
+The runtime Docker image includes compiled `dist/` code and SQL migrations, so production
+migration jobs should use `migrate:prod` or run `node dist/db/migrate.js` directly. Do not rely on
+Cloud Run app startup to mutate schema. Startup may run multiple instances and should stay focused
+on serving traffic. Demo data seeding is separate and controlled by `AUTO_SEED_DEMO`.
 
 ## Cloud Run Environment
 

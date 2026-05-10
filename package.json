@@ -13,7 +13,8 @@
     "api:build": "npm --prefix api run build",
     "api:test": "npm --prefix api test",
     "api:typecheck": "npm --prefix api run typecheck",
-    "api:migrate": "npm --prefix api run migrate"
+    "api:migrate": "npm --prefix api run migrate",
+    "api:migrate:prod": "npm --prefix api run migrate:prod"
   },
   "dependencies": {
     "lucide-react": "^0.555.0",
