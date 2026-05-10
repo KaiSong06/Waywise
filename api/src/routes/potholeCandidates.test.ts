@@ -33,6 +33,7 @@ describe("pothole candidate routes", () => {
       candidateReadService: {
         listMapCandidates,
         getCandidateDetail: vi.fn(),
+        getDashboardSummary: vi.fn(),
       },
     });
 
@@ -78,6 +79,46 @@ describe("pothole candidate routes", () => {
       status: "assigned",
     });
     expect(updateStatus).toHaveBeenCalledWith("candidate-1", "assigned", undefined);
+  });
+
+  it("returns dashboard summary metrics", async () => {
+    const app = await createTestApp({
+      candidateReadService: {
+        listMapCandidates: vi.fn(),
+        getCandidateDetail: vi.fn(),
+        getDashboardSummary: vi.fn(async () => ({
+          total: 3,
+          active: 2,
+          highSeverity: 1,
+          averageConfidence: 74,
+          byStatus: {
+            monitoring: 1,
+            verified: 1,
+            assigned: 0,
+            repaired: 1,
+            recurring: 0,
+          },
+          bySeverity: {
+            low: 1,
+            medium: 1,
+            high: 1,
+          },
+        })),
+      },
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/dashboard/summary",
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      total: 3,
+      active: 2,
+      highSeverity: 1,
+      averageConfidence: 74,
+    });
   });
 
   it("rejects invalid status changes", async () => {

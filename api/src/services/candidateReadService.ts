@@ -15,6 +15,16 @@ export interface CandidateMapFilters {
 export interface CandidateReadService {
   listMapCandidates(filters: CandidateMapFilters): Promise<CandidateFeatureCollection>;
   getCandidateDetail(id: string): Promise<CandidateDetail | null>;
+  getDashboardSummary(): Promise<DashboardSummary>;
+}
+
+export interface DashboardSummary {
+  total: number;
+  active: number;
+  highSeverity: number;
+  averageConfidence: number;
+  byStatus: Record<CandidateStatus, number>;
+  bySeverity: Record<SeverityLevel, number>;
 }
 
 export interface CandidateFeatureCollection {
@@ -94,6 +104,12 @@ export function createCandidateReadService(pool: DbPool): CandidateReadService {
         })),
       };
     },
+
+    async getDashboardSummary() {
+      const candidates = await listCandidates(pool);
+
+      return summarizeCandidates(candidates);
+    },
   };
 }
 
@@ -151,5 +167,40 @@ function toProperties(candidate: CandidateRecord): CandidateProperties {
     firstDetectedAt: candidate.firstDetectedAt?.toISOString() ?? null,
     lastDetectedAt: candidate.lastDetectedAt?.toISOString() ?? null,
     status: candidate.status,
+  };
+}
+
+function summarizeCandidates(candidates: CandidateRecord[]): DashboardSummary {
+  const byStatus = {
+    monitoring: 0,
+    verified: 0,
+    assigned: 0,
+    repaired: 0,
+    recurring: 0,
+  };
+  const bySeverity = {
+    low: 0,
+    medium: 0,
+    high: 0,
+  };
+
+  for (const candidate of candidates) {
+    byStatus[candidate.status] += 1;
+    bySeverity[candidate.severity] += 1;
+  }
+
+  return {
+    total: candidates.length,
+    active: candidates.filter((candidate) => activeStatuses.has(candidate.status)).length,
+    highSeverity: bySeverity.high,
+    averageConfidence:
+      candidates.length === 0
+        ? 0
+        : Math.round(
+            candidates.reduce((total, candidate) => total + candidate.confidenceScore, 0) /
+              candidates.length,
+          ),
+    byStatus,
+    bySeverity,
   };
 }

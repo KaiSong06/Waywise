@@ -20,6 +20,8 @@ export async function registerPotholeCandidateRoutes(
     candidateReadService.listMapCandidates(parseMapFilters(request.query)),
   );
 
+  app.get("/api/dashboard/summary", async () => candidateReadService.getDashboardSummary());
+
   app.get<{ Params: { id: string } }>("/api/pothole-candidates/:id", async (request, reply) => {
     const detail = await candidateReadService.getCandidateDetail(request.params.id);
 
