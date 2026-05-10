@@ -33,6 +33,20 @@ npm test
 npm run build
 ```
 
+## iOS Demo App
+
+The native SwiftUI demo app lives in `ios/`. It is intended for a recorded demo where the phone
+starts a demo drive, samples location and motion data, and uploads a manually triggered
+road-impact event to the deployed backend.
+
+```bash
+cd ios
+xcodegen generate --spec project.yml --project .
+open Waywise.xcodeproj
+```
+
+Detailed run notes live in `ios/README.md`.
+
 ## Backend API
 
 The backend lives in `api/` as a separate Fastify/TypeScript service for the Cloud Run
