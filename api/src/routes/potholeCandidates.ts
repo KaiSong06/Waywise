@@ -16,9 +16,18 @@ export async function registerPotholeCandidateRoutes(
   candidateReadService: CandidateReadService,
   statusWorkflowService: StatusWorkflowService,
 ) {
-  app.get<{ Querystring: MapQuery }>("/api/pothole-candidates/map", async (request) =>
-    candidateReadService.listMapCandidates(parseMapFilters(request.query)),
-  );
+  app.get<{ Querystring: MapQuery }>("/api/pothole-candidates/map", async (request, reply) => {
+    const parsed = parseMapFilters(request.query);
+
+    if (parsed.invalidFilters.length > 0) {
+      return reply.code(400).send({
+        error: "invalid_map_filter",
+        invalidFilters: parsed.invalidFilters,
+      });
+    }
+
+    return candidateReadService.listMapCandidates(parsed.filters);
+  });
 
   app.get("/api/dashboard/summary", async () => candidateReadService.getDashboardSummary());
 
@@ -65,30 +74,70 @@ export async function registerPotholeCandidateRoutes(
   );
 }
 
-function parseMapFilters(query: MapQuery): CandidateMapFilters {
+function parseMapFilters(query: MapQuery): { filters: CandidateMapFilters; invalidFilters: string[] } {
+  const severities = parseList(query.severity, severityLevels);
+  const statuses = parseList(query.status, candidateStatuses);
+  const minConfidence = parseNumber(query.minConfidence, { min: 0, max: 100 });
+  const lastDetectedWithinHours = parseNumber(query.lastDetectedWithinHours, { min: 0 });
+  const invalidFilters = [
+    ...(severities.invalid ? ["severity"] : []),
+    ...(statuses.invalid ? ["status"] : []),
+    ...(minConfidence.invalid ? ["minConfidence"] : []),
+    ...(lastDetectedWithinHours.invalid ? ["lastDetectedWithinHours"] : []),
+    ...(isInvalidActiveOnly(query.activeOnly) ? ["activeOnly"] : []),
+  ];
+
   return {
-    severities: parseList(query.severity, severityLevels),
-    statuses: parseList(query.status, candidateStatuses),
-    minConfidence: parseNumber(query.minConfidence),
-    lastDetectedWithinHours: parseNumber(query.lastDetectedWithinHours),
-    activeOnly: query.activeOnly === undefined ? true : query.activeOnly !== "false",
+    filters: {
+      severities: severities.values,
+      statuses: statuses.values,
+      minConfidence: minConfidence.value,
+      lastDetectedWithinHours: lastDetectedWithinHours.value,
+      activeOnly: query.activeOnly === undefined ? true : query.activeOnly === "true",
+    },
+    invalidFilters,
   };
 }
 
-function parseList<T extends string>(value: string | undefined, allowed: readonly T[]): T[] | undefined {
+function parseList<T extends string>(
+  value: string | undefined,
+  allowed: readonly T[],
+): { values?: T[]; invalid: boolean } {
   if (!value) {
-    return undefined;
+    return { invalid: false };
   }
 
   const values = value.split(",").map((item) => item.trim());
-  return values.filter((item): item is T => allowed.includes(item as T));
+  const allowedValues = values.filter((item): item is T => allowed.includes(item as T));
+
+  return {
+    values: allowedValues,
+    invalid: allowedValues.length !== values.length,
+  };
 }
 
-function parseNumber(value: string | undefined) {
+function parseNumber(value: string | undefined, options: { min?: number; max?: number } = {}) {
   if (value === undefined || value === "") {
-    return undefined;
+    return { invalid: false };
   }
 
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
+
+  if (!Number.isFinite(parsed)) {
+    return { invalid: true };
+  }
+
+  if (options.min !== undefined && parsed < options.min) {
+    return { invalid: true };
+  }
+
+  if (options.max !== undefined && parsed > options.max) {
+    return { invalid: true };
+  }
+
+  return { value: parsed, invalid: false };
+}
+
+function isInvalidActiveOnly(value: string | undefined) {
+  return value !== undefined && value !== "true" && value !== "false";
 }

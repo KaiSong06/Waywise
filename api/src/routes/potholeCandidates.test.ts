@@ -81,6 +81,29 @@ describe("pothole candidate routes", () => {
     expect(updateStatus).toHaveBeenCalledWith("candidate-1", "assigned", undefined);
   });
 
+  it("rejects invalid map filters", async () => {
+    const listMapCandidates = vi.fn();
+    const app = await createTestApp({
+      candidateReadService: {
+        listMapCandidates,
+        getCandidateDetail: vi.fn(),
+        getDashboardSummary: vi.fn(),
+      },
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/pothole-candidates/map?severity=critical&minConfidence=high",
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({
+      error: "invalid_map_filter",
+      invalidFilters: ["severity", "minConfidence"],
+    });
+    expect(listMapCandidates).not.toHaveBeenCalled();
+  });
+
   it("returns dashboard summary metrics", async () => {
     const app = await createTestApp({
       candidateReadService: {
