@@ -1,0 +1,441 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1503BC03B211FF04D0A7BCD4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B75F988EE49D36304D87ACB /* ContentView.swift */; };
+		40228B9BD35E6E9951E4CC5B /* ImpactEventPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F4E3552311A35CE6D44CC6F /* ImpactEventPayload.swift */; };
+		57E2732DC743DA8A60785503 /* ImpactEventBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538B131CF8DF6BC5288553BB /* ImpactEventBuilder.swift */; };
+		5A6EC61A5A5B817805FB5969 /* DemoDriveViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F681AA5BCD32F96FC97598C9 /* DemoDriveViewModel.swift */; };
+		8B4BB233CFEAAE0AB3E65E58 /* WaywiseAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0635CE3DD634EB9FC5A453 /* WaywiseAPIClientTests.swift */; };
+		AAC53F04BC72B0AE34B16CE4 /* MotionSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB48F5C0B2EA9CB8D5C53A6 /* MotionSampler.swift */; };
+		B50DC7F035BAD128B82A8841 /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8999D016AD7DB0FF6C6237D /* LocationProvider.swift */; };
+		BCE77809E7E572F1C4EBA24E /* WaywiseDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622CA7C91D76EFEBD1F93F4D /* WaywiseDemoApp.swift */; };
+		C9987B6CAEDC7960F90E50EB /* ImpactEventPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A000CD853020E294544251 /* ImpactEventPayloadTests.swift */; };
+		DE13BF763D8828EE489D108A /* WaywiseAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EB5E7162843E4AB90F33B7 /* WaywiseAPIClient.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0A2DD8F8DA11BE9D984239E8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 855EA484AEFDF8E32B2264A3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CD54F45F00F37749319D8D1F;
+			remoteInfo = WaywiseDemo;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		10A000CD853020E294544251 /* ImpactEventPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactEventPayloadTests.swift; sourceTree = "<group>"; };
+		4F4E3552311A35CE6D44CC6F /* ImpactEventPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactEventPayload.swift; sourceTree = "<group>"; };
+		538B131CF8DF6BC5288553BB /* ImpactEventBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactEventBuilder.swift; sourceTree = "<group>"; };
+		60FB0051A99879036070F616 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		622CA7C91D76EFEBD1F93F4D /* WaywiseDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaywiseDemoApp.swift; sourceTree = "<group>"; };
+		6B75F988EE49D36304D87ACB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		72EB5E7162843E4AB90F33B7 /* WaywiseAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaywiseAPIClient.swift; sourceTree = "<group>"; };
+		92FA612BC845F839CE69D01B /* WaywiseDemo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WaywiseDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D36BDB146EEE19BE30443F04 /* WaywiseDemoTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = WaywiseDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F681AA5BCD32F96FC97598C9 /* DemoDriveViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDriveViewModel.swift; sourceTree = "<group>"; };
+		F8999D016AD7DB0FF6C6237D /* LocationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationProvider.swift; sourceTree = "<group>"; };
+		FAB48F5C0B2EA9CB8D5C53A6 /* MotionSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionSampler.swift; sourceTree = "<group>"; };
+		FD0635CE3DD634EB9FC5A453 /* WaywiseAPIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaywiseAPIClientTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		16708087E6B68BD82A5017E9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				92FA612BC845F839CE69D01B /* WaywiseDemo.app */,
+				D36BDB146EEE19BE30443F04 /* WaywiseDemoTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1D8DA9E1417EE84E61443208 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4F4E3552311A35CE6D44CC6F /* ImpactEventPayload.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		3B09740CA9CA26A722FA464B /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				F681AA5BCD32F96FC97598C9 /* DemoDriveViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		94C8A3D2FEE3D237A44EB293 /* WaywiseDemoTests */ = {
+			isa = PBXGroup;
+			children = (
+				10A000CD853020E294544251 /* ImpactEventPayloadTests.swift */,
+				FD0635CE3DD634EB9FC5A453 /* WaywiseAPIClientTests.swift */,
+			);
+			path = WaywiseDemoTests;
+			sourceTree = "<group>";
+		};
+		AC8B246DA0D9C80A1B171F1B /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				538B131CF8DF6BC5288553BB /* ImpactEventBuilder.swift */,
+				F8999D016AD7DB0FF6C6237D /* LocationProvider.swift */,
+				FAB48F5C0B2EA9CB8D5C53A6 /* MotionSampler.swift */,
+				72EB5E7162843E4AB90F33B7 /* WaywiseAPIClient.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		DF9B1358A7F60BEAE25DEFFE = {
+			isa = PBXGroup;
+			children = (
+				FAE95B5598E8D556ED5182A0 /* WaywiseDemo */,
+				94C8A3D2FEE3D237A44EB293 /* WaywiseDemoTests */,
+				16708087E6B68BD82A5017E9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FAE95B5598E8D556ED5182A0 /* WaywiseDemo */ = {
+			isa = PBXGroup;
+			children = (
+				6B75F988EE49D36304D87ACB /* ContentView.swift */,
+				60FB0051A99879036070F616 /* Info.plist */,
+				622CA7C91D76EFEBD1F93F4D /* WaywiseDemoApp.swift */,
+				1D8DA9E1417EE84E61443208 /* Models */,
+				AC8B246DA0D9C80A1B171F1B /* Services */,
+				3B09740CA9CA26A722FA464B /* ViewModels */,
+			);
+			path = WaywiseDemo;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6BEC4B17D1BC8E152DEE6FB2 /* WaywiseDemoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F1BCF5643C55D74267F171B /* Build configuration list for PBXNativeTarget "WaywiseDemoTests" */;
+			buildPhases = (
+				E7196F019079A04D92CADEB6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E9950753C378AE82199262F0 /* PBXTargetDependency */,
+			);
+			name = WaywiseDemoTests;
+			packageProductDependencies = (
+			);
+			productName = WaywiseDemoTests;
+			productReference = D36BDB146EEE19BE30443F04 /* WaywiseDemoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CD54F45F00F37749319D8D1F /* WaywiseDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0665C5A36B451368EB0F15B7 /* Build configuration list for PBXNativeTarget "WaywiseDemo" */;
+			buildPhases = (
+				F5AC6D1057386C60E05AC7E9 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WaywiseDemo;
+			packageProductDependencies = (
+			);
+			productName = WaywiseDemo;
+			productReference = 92FA612BC845F839CE69D01B /* WaywiseDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		855EA484AEFDF8E32B2264A3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 7A9253E6EF9D38443561408F /* Build configuration list for PBXProject "Waywise" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = DF9B1358A7F60BEAE25DEFFE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 16708087E6B68BD82A5017E9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CD54F45F00F37749319D8D1F /* WaywiseDemo */,
+				6BEC4B17D1BC8E152DEE6FB2 /* WaywiseDemoTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E7196F019079A04D92CADEB6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C9987B6CAEDC7960F90E50EB /* ImpactEventPayloadTests.swift in Sources */,
+				8B4BB233CFEAAE0AB3E65E58 /* WaywiseAPIClientTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5AC6D1057386C60E05AC7E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1503BC03B211FF04D0A7BCD4 /* ContentView.swift in Sources */,
+				5A6EC61A5A5B817805FB5969 /* DemoDriveViewModel.swift in Sources */,
+				57E2732DC743DA8A60785503 /* ImpactEventBuilder.swift in Sources */,
+				40228B9BD35E6E9951E4CC5B /* ImpactEventPayload.swift in Sources */,
+				B50DC7F035BAD128B82A8841 /* LocationProvider.swift in Sources */,
+				AAC53F04BC72B0AE34B16CE4 /* MotionSampler.swift in Sources */,
+				DE13BF763D8828EE489D108A /* WaywiseAPIClient.swift in Sources */,
+				BCE77809E7E572F1C4EBA24E /* WaywiseDemoApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E9950753C378AE82199262F0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CD54F45F00F37749319D8D1F /* WaywiseDemo */;
+			targetProxy = 0A2DD8F8DA11BE9D984239E8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4A53085B68ADEA32195551A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.waywise.demo.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WaywiseDemo.app/WaywiseDemo";
+			};
+			name = Debug;
+		};
+		55D9841BF0B7A6F3FBF499CA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = WaywiseDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.waywise.demo;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5E6B54797D7C21F6F093E99F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		8CD9113A53A424D107F52DD2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = WaywiseDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.waywise.demo;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AAF88D424A8936727E32C0CA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		F58CC3FB634C1B64824D7A14 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.waywise.demo.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WaywiseDemo.app/WaywiseDemo";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0665C5A36B451368EB0F15B7 /* Build configuration list for PBXNativeTarget "WaywiseDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8CD9113A53A424D107F52DD2 /* Debug */,
+				55D9841BF0B7A6F3FBF499CA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7A9253E6EF9D38443561408F /* Build configuration list for PBXProject "Waywise" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E6B54797D7C21F6F093E99F /* Debug */,
+				AAF88D424A8936727E32C0CA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9F1BCF5643C55D74267F171B /* Build configuration list for PBXNativeTarget "WaywiseDemoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A53085B68ADEA32195551A1 /* Debug */,
+				F58CC3FB634C1B64824D7A14 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 855EA484AEFDF8E32B2264A3 /* Project object */;
+}
