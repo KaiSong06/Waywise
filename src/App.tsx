@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Activity, AlertTriangle, MapPin, RadioTower, ShieldCheck, SlidersHorizontal } from "lucide-react";
 import { defaultFilters, demoCandidates, severityOptions, statusOptions } from "./data/demoCandidates";
 import {
@@ -13,6 +13,7 @@ import {
 } from "./domain/candidates";
 import { MapView } from "./components/MapView";
 import { MetricTile } from "./components/MetricTile";
+import { createWaywiseApiClient, getConfiguredWaywiseApiBaseUrl } from "./services/waywiseApi";
 
 const demoNow = new Date("2026-05-10T15:00:00Z");
 const recencyOptions = [
@@ -75,13 +76,68 @@ function CandidateButton({
 }
 
 export default function App() {
-  const [candidates, setCandidates] = useState(demoCandidates);
+  const apiBaseUrl = getConfiguredWaywiseApiBaseUrl();
+  const apiClient = useMemo(
+    () => (apiBaseUrl ? createWaywiseApiClient(apiBaseUrl) : undefined),
+    [apiBaseUrl],
+  );
+  const [candidates, setCandidates] = useState<PotholeCandidate[]>(() =>
+    apiClient ? [] : demoCandidates,
+  );
   const [filters, setFilters] = useState<CandidateFilters>(defaultFilters);
-  const [selectedId, setSelectedId] = useState(demoCandidates[0].id);
+  const [selectedId, setSelectedId] = useState(apiClient ? "" : demoCandidates[0].id);
+  const [apiState, setApiState] = useState<"fixture" | "loading" | "connected" | "error">(
+    apiClient ? "loading" : "fixture",
+  );
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!apiClient) {
+      setCandidates(demoCandidates);
+      setSelectedId((current) => current || demoCandidates[0].id);
+      setApiState("fixture");
+      setApiError(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    setApiState("loading");
+    setApiError(null);
+
+    apiClient
+      .listMapCandidates(filters)
+      .then((nextCandidates) => {
+        if (cancelled) {
+          return;
+        }
+
+        setCandidates(nextCandidates);
+        setSelectedId((current) =>
+          nextCandidates.some((candidate) => candidate.id === current)
+            ? current
+            : (nextCandidates[0]?.id ?? ""),
+        );
+        setApiState("connected");
+      })
+      .catch((error: unknown) => {
+        if (cancelled) {
+          return;
+        }
+
+        setCandidates((current) => current);
+        setApiState("error");
+        setApiError(error instanceof Error ? error.message : "Unable to load live API data");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [apiClient, filters]);
 
   const filteredCandidates = useMemo(
-    () => filterCandidates(candidates, filters, demoNow),
-    [candidates, filters],
+    () => (apiClient ? candidates : filterCandidates(candidates, filters, demoNow)),
+    [apiClient, candidates, filters],
   );
   const visibleCandidates = filteredCandidates.length > 0 ? filteredCandidates : candidates;
   const selectedCandidate =
@@ -106,8 +162,38 @@ export default function App() {
     }));
   }
 
-  function updateCandidate(status: CandidateStatus) {
-    setCandidates((current) => updateCandidateStatus(current, selectedCandidate.id, status));
+  async function updateCandidate(status: CandidateStatus) {
+    if (!selectedCandidate) {
+      return;
+    }
+
+    if (!apiClient) {
+      setCandidates((current) => updateCandidateStatus(current, selectedCandidate.id, status));
+      return;
+    }
+
+    try {
+      setApiError(null);
+      const result = await apiClient.updateCandidateStatus(selectedCandidate.id, status);
+      setCandidates((current) => updateCandidateStatus(current, result.id, result.status));
+      setApiState("connected");
+    } catch (error) {
+      setApiState("error");
+      setApiError(error instanceof Error ? error.message : "Unable to update candidate status");
+    }
+  }
+
+  const liveChipLabel =
+    apiState === "fixture"
+      ? "Fixture mode"
+      : apiState === "connected"
+        ? "Live API connected"
+        : apiState === "error"
+          ? "Live API unavailable"
+          : "Loading live API";
+
+  function formatMaybeDateTime(value: string | null) {
+    return value ? formatDateTime(value) : "No detections yet";
   }
 
   return (
@@ -123,9 +209,16 @@ export default function App() {
         </div>
         <div className="live-chip">
           <RadioTower size={18} />
-          Demo data live
+          {liveChipLabel}
         </div>
       </header>
+
+      {apiError ? (
+        <section className="api-alert" role="alert">
+          <strong>Live API unavailable</strong>
+          <span>{apiError}</span>
+        </section>
+      ) : null}
 
       <section className="metric-grid" aria-label="Dashboard summary">
         <MetricTile label="Active candidates" value={summary.active} icon={<Activity size={20} />} />
@@ -212,14 +305,18 @@ export default function App() {
           </label>
 
           <div className="candidate-list" aria-label="Pothole candidates">
-            {visibleCandidates.map((candidate) => (
+            {visibleCandidates.length > 0 ? (
+              visibleCandidates.map((candidate) => (
               <CandidateButton
                 candidate={candidate}
                 key={candidate.id}
                 onSelect={setSelectedId}
-                selected={candidate.id === selectedCandidate.id}
+                selected={candidate.id === selectedCandidate?.id}
               />
-            ))}
+              ))
+            ) : (
+              <p className="empty-state">No pothole candidates available.</p>
+            )}
           </div>
         </aside>
 
@@ -227,60 +324,70 @@ export default function App() {
           candidates={filteredCandidates}
           featureCollection={featureCollection}
           onSelect={setSelectedId}
-          selectedId={selectedCandidate.id}
+          selectedId={selectedCandidate?.id ?? ""}
         />
 
         <aside className="detail-panel" aria-label="Selected candidate details">
-          <div>
-            <p className="eyebrow">Candidate details</p>
-            <h2>{selectedCandidate.address}</h2>
-            <span className={`severity-pill severity-${selectedCandidate.severity}`}>
-              {severityLabels[selectedCandidate.severity]} severity
-            </span>
-          </div>
+          {selectedCandidate ? (
+            <>
+              <div>
+                <p className="eyebrow">Candidate details</p>
+                <h2>{selectedCandidate.address}</h2>
+                <span className={`severity-pill severity-${selectedCandidate.severity}`}>
+                  {severityLabels[selectedCandidate.severity]} severity
+                </span>
+              </div>
 
-          <dl className="detail-grid">
-            <div>
-              <dt>Confidence score</dt>
-              <dd>{selectedCandidate.confidenceScore}%</dd>
-            </div>
-            <div>
-              <dt>Unique sources</dt>
-              <dd>{selectedCandidate.uniqueSourceCount}</dd>
-            </div>
-            <div>
-              <dt>Average impact</dt>
-              <dd>{selectedCandidate.averageImpactMagnitude.toFixed(1)}</dd>
-            </div>
-            <div>
-              <dt>Peak impact</dt>
-              <dd>{selectedCandidate.peakImpactMagnitude.toFixed(1)}</dd>
-            </div>
-            <div>
-              <dt>Coordinates</dt>
-              <dd>
-                {selectedCandidate.latitude.toFixed(4)}, {selectedCandidate.longitude.toFixed(4)}
-              </dd>
-            </div>
-            <div>
-              <dt>Last detected</dt>
-              <dd>{formatDateTime(selectedCandidate.lastDetectedAt)}</dd>
-            </div>
-          </dl>
+              <dl className="detail-grid">
+                <div>
+                  <dt>Confidence score</dt>
+                  <dd>{selectedCandidate.confidenceScore}%</dd>
+                </div>
+                <div>
+                  <dt>Unique sources</dt>
+                  <dd>{selectedCandidate.uniqueSourceCount}</dd>
+                </div>
+                <div>
+                  <dt>Average impact</dt>
+                  <dd>{selectedCandidate.averageImpactMagnitude.toFixed(1)}</dd>
+                </div>
+                <div>
+                  <dt>Peak impact</dt>
+                  <dd>{selectedCandidate.peakImpactMagnitude.toFixed(1)}</dd>
+                </div>
+                <div>
+                  <dt>Coordinates</dt>
+                  <dd>
+                    {selectedCandidate.latitude.toFixed(4)}, {selectedCandidate.longitude.toFixed(4)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Last detected</dt>
+                  <dd>{formatMaybeDateTime(selectedCandidate.lastDetectedAt)}</dd>
+                </div>
+              </dl>
 
-          <label className="select-control">
-            <span>Current status</span>
-            <select
-              value={selectedCandidate.status}
-              onChange={(event) => updateCandidate(event.target.value as CandidateStatus)}
-            >
-              {statusOptions.map((status) => (
-                <option key={status} value={status}>
-                  {statusLabels[status]}
-                </option>
-              ))}
-            </select>
-          </label>
+              <label className="select-control">
+                <span>Current status</span>
+                <select
+                  value={selectedCandidate.status}
+                  onChange={(event) => void updateCandidate(event.target.value as CandidateStatus)}
+                >
+                  {statusOptions.map((status) => (
+                    <option key={status} value={status}>
+                      {statusLabels[status]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </>
+          ) : (
+            <div className="detail-empty">
+              <p className="eyebrow">Candidate details</p>
+              <h2>No candidate selected</h2>
+              <p>No live pothole candidates are available for the current filters.</p>
+            </div>
+          )}
         </aside>
       </section>
     </main>

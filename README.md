@@ -4,10 +4,10 @@ Passive pothole detection demo dashboard.
 
 ## Dashboard
 
-The current app is a React/Vite dashboard skeleton for the deployed demo. It uses local
-candidate fixture data shaped like the future Cloud Run GeoJSON API, renders a Mapbox-backed
-road map when a token is configured, and falls back to an interactive map preview without a
-token.
+The current app is a React/Vite dashboard for the deployed demo. It can run in local fixture mode
+or connect to the deployed Cloud Run API when `VITE_API_BASE_URL` is configured. The dashboard
+renders a Mapbox-backed road map when a token is configured and falls back to an interactive map
+preview without a token.
 
 ## Local Development
 
@@ -16,13 +16,15 @@ npm install
 npm run dev
 ```
 
-For the live Mapbox base map, copy `.env.example` to `.env` and set:
+For the live Mapbox base map and backend API, copy `.env.example` to `.env` and set:
 
 ```bash
 VITE_MAPBOX_TOKEN=your_mapbox_token
+VITE_API_BASE_URL=https://your-cloud-run-service-url
 ```
 
-Without the token, the dashboard still runs with the built-in map preview.
+Without `VITE_API_BASE_URL`, the dashboard uses fixture candidates for local development. Without
+`VITE_MAPBOX_TOKEN`, the dashboard still runs with the built-in map preview.
 
 ## Verification
 
@@ -59,5 +61,6 @@ Backend deployment notes live in `docs/deployment/backend-gcp.md`.
 
 ## Vercel
 
-Deploy the repo as a Vite app. Configure `VITE_MAPBOX_TOKEN` in Vercel project environment
-variables when the live Mapbox basemap is needed.
+Deploy the repo as a Vite app. Configure `VITE_MAPBOX_TOKEN` and `VITE_API_BASE_URL` in Vercel
+project environment variables for the live demo. After Vercel creates the production URL, add that
+exact origin to the backend `CORS_ORIGINS` value.
