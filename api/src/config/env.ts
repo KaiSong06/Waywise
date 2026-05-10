@@ -14,6 +14,7 @@ export interface ApiConfig {
   autoSeedDemo: boolean;
   clusteringRadiusMeters: number;
   duplicateWindowSeconds: number;
+  maxGpsAccuracyMeters: number;
   demoMode: boolean;
 }
 
@@ -45,6 +46,11 @@ export function loadEnv(env: RawEnv = process.env): ApiConfig {
       defaultValue: 30,
       min: 1,
       max: 300,
+    }),
+    maxGpsAccuracyMeters: parseNumber("MAX_GPS_ACCURACY_METERS", env.MAX_GPS_ACCURACY_METERS, {
+      defaultValue: 50,
+      min: 1,
+      max: 500,
     }),
     demoMode: parseBoolean("DEMO_MODE", env.DEMO_MODE, false),
   };

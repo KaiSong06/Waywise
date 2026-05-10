@@ -42,6 +42,16 @@ export interface ImpactEventRecord {
   rejectionReason?: string;
 }
 
+export interface DuplicateImpactSearchInput {
+  anonymousSourceId: string;
+  driveSessionId: string;
+  latitude: number;
+  longitude: number;
+  occurredAt: Date;
+  duplicateWindowSeconds: number;
+  radiusMeters: number;
+}
+
 export async function insertImpactEvent(client: DbClient, input: ImpactEventInput): Promise<ImpactEventRecord> {
   await client.query(
     `
@@ -127,6 +137,62 @@ export async function insertImpactEvent(client: DbClient, input: ImpactEventInpu
   );
 
   return mapImpactEventRow(result.rows[0]);
+}
+
+export async function findDuplicateImpactEvent(
+  client: DbClient,
+  input: DuplicateImpactSearchInput,
+): Promise<{ id: string } | null> {
+  const result = await client.query<{ id: string }>(
+    `
+      SELECT id
+      FROM impact_events
+      WHERE anonymous_source_id = $1
+        AND drive_session_id = $2
+        AND accepted = true
+        AND occurred_at BETWEEN $3::timestamptz - make_interval(secs => $4)
+          AND $3::timestamptz + make_interval(secs => $4)
+        AND ST_DWithin(location, ST_SetSRID(ST_MakePoint($5, $6), 4326)::geography, $7)
+      ORDER BY occurred_at DESC
+      LIMIT 1
+    `,
+    [
+      input.anonymousSourceId,
+      input.driveSessionId,
+      input.occurredAt,
+      input.duplicateWindowSeconds,
+      input.longitude,
+      input.latitude,
+      input.radiusMeters,
+    ],
+  );
+
+  return result.rows[0] ?? null;
+}
+
+export async function findImpactEventById(client: DbClient, id: string): Promise<ImpactEventRecord | null> {
+  const result = await client.query<ImpactEventRow>("SELECT * FROM impact_events WHERE id = $1", [id]);
+
+  if (result.rowCount === 0) {
+    return null;
+  }
+
+  return mapImpactEventRow(result.rows[0]);
+}
+
+export async function listUnassignedAcceptedImpactEvents(client: DbClient): Promise<ImpactEventRecord[]> {
+  const result = await client.query<ImpactEventRow>(
+    `
+      SELECT impact_events.*
+      FROM impact_events
+      LEFT JOIN candidate_events ON candidate_events.impact_event_id = impact_events.id
+      WHERE impact_events.accepted = true
+        AND candidate_events.impact_event_id IS NULL
+      ORDER BY impact_events.occurred_at ASC
+    `,
+  );
+
+  return result.rows.map(mapImpactEventRow);
 }
 
 interface ImpactEventRow {

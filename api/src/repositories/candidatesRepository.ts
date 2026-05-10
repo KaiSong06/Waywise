@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { DbClient } from "../db/pool.js";
 import type { CandidateStatus, SeverityLevel } from "../db/schema.js";
+import type { CandidateEvidenceEvent, CandidateScore } from "../domain/candidate.js";
 
 export interface CandidateRecord {
   id: string;
@@ -138,6 +139,110 @@ export async function listCandidates(client: DbClient): Promise<CandidateRecord[
   );
 
   return result.rows.map(mapCandidateRow);
+}
+
+export async function linkCandidateEvent(
+  client: DbClient,
+  input: { candidateId: string; eventId: string },
+): Promise<void> {
+  await client.query(
+    `
+      INSERT INTO candidate_events (
+        pothole_candidate_id,
+        impact_event_id,
+        distance_meters_from_candidate
+      )
+      SELECT $1, $2, ST_Distance(pothole_candidates.location, impact_events.location)
+      FROM pothole_candidates, impact_events
+      WHERE pothole_candidates.id = $1
+        AND impact_events.id = $2
+      ON CONFLICT (pothole_candidate_id, impact_event_id) DO NOTHING
+    `,
+    [input.candidateId, input.eventId],
+  );
+}
+
+export async function getCandidateEvidence(
+  client: DbClient,
+  candidateId: string,
+): Promise<CandidateEvidenceEvent[]> {
+  const result = await client.query<{
+    id: string;
+    anonymous_source_id: string;
+    impact_magnitude: number;
+    latitude: number;
+    longitude: number;
+    occurred_at: Date;
+    gps_accuracy_meters: number | null;
+  }>(
+    `
+      SELECT
+        impact_events.id,
+        impact_events.anonymous_source_id,
+        impact_events.impact_magnitude,
+        impact_events.latitude,
+        impact_events.longitude,
+        impact_events.occurred_at,
+        impact_events.gps_accuracy_meters
+      FROM candidate_events
+      JOIN impact_events ON impact_events.id = candidate_events.impact_event_id
+      WHERE candidate_events.pothole_candidate_id = $1
+        AND impact_events.accepted = true
+      ORDER BY impact_events.occurred_at ASC
+    `,
+    [candidateId],
+  );
+
+  return result.rows.map((row) => ({
+    id: row.id,
+    anonymousSourceId: row.anonymous_source_id,
+    impactMagnitude: Number(row.impact_magnitude),
+    latitude: Number(row.latitude),
+    longitude: Number(row.longitude),
+    occurredAt: row.occurred_at,
+    gpsAccuracyMeters: row.gps_accuracy_meters === null ? undefined : Number(row.gps_accuracy_meters),
+  }));
+}
+
+export async function updateCandidateScore(
+  client: DbClient,
+  candidateId: string,
+  score: CandidateScore,
+): Promise<CandidateRecord> {
+  const result = await client.query<CandidateRow>(
+    `
+      UPDATE pothole_candidates
+      SET confidence_score = $2,
+        severity_level = $3,
+        heat_radius_meters = $4,
+        heat_intensity = $5,
+        unique_source_count = $6,
+        event_count = $7,
+        average_impact_magnitude = $8,
+        peak_impact_magnitude = $9,
+        first_detected_at = $10,
+        last_detected_at = $11,
+        last_scored_at = now(),
+        updated_at = now()
+      WHERE id = $1
+      RETURNING *
+    `,
+    [
+      candidateId,
+      score.confidenceScore,
+      score.severity,
+      score.heatRadiusMeters,
+      score.heatIntensity,
+      score.uniqueSourceCount,
+      score.eventCount,
+      score.averageImpactMagnitude,
+      score.peakImpactMagnitude,
+      score.firstDetectedAt,
+      score.lastDetectedAt,
+    ],
+  );
+
+  return mapCandidateRow(result.rows[0]);
 }
 
 interface CandidateRow {

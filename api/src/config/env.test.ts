@@ -13,6 +13,7 @@ describe("loadEnv", () => {
       AUTO_SEED_DEMO: "true",
       CLUSTERING_RADIUS_METERS: "18",
       DUPLICATE_WINDOW_SECONDS: "45",
+      MAX_GPS_ACCURACY_METERS: "35",
       DEMO_MODE: "true",
     });
 
@@ -27,6 +28,7 @@ describe("loadEnv", () => {
       autoSeedDemo: true,
       clusteringRadiusMeters: 18,
       duplicateWindowSeconds: 45,
+      maxGpsAccuracyMeters: 35,
       demoMode: true,
     });
   });
@@ -43,6 +45,7 @@ describe("loadEnv", () => {
     expect(config.autoSeedDemo).toBe(false);
     expect(config.clusteringRadiusMeters).toBe(20);
     expect(config.duplicateWindowSeconds).toBe(30);
+    expect(config.maxGpsAccuracyMeters).toBe(50);
     expect(config.demoMode).toBe(false);
   });
 
