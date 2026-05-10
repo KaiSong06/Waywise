@@ -24,17 +24,32 @@ const defaultCorsOrigins = ["http://localhost:5173"];
 
 export function loadEnv(env: RawEnv = process.env): ApiConfig {
   const nodeEnv = parseNodeEnv(env.NODE_ENV);
+  const databaseUrl = emptyToUndefined(env.DATABASE_URL);
+  const databaseUser = emptyToUndefined(env.DB_USER);
+  const databasePassword = emptyToUndefined(env.DB_PASSWORD);
+  const databaseName = emptyToUndefined(env.DB_NAME);
+  const cloudSqlConnectionName = emptyToUndefined(env.CLOUD_SQL_CONNECTION_NAME);
+  const databaseSocketPath = emptyToUndefined(env.DATABASE_SOCKET_PATH);
+
+  validateDatabaseConfig({
+    databaseUrl,
+    databaseUser,
+    databasePassword,
+    databaseName,
+    cloudSqlConnectionName,
+    databaseSocketPath,
+  });
 
   return {
     nodeEnv,
     host: env.HOST ?? "0.0.0.0",
     port: parseNumber("PORT", env.PORT, { defaultValue: 8080, min: 1, max: 65535 }),
-    databaseUrl: emptyToUndefined(env.DATABASE_URL),
-    databaseUser: emptyToUndefined(env.DB_USER),
-    databasePassword: emptyToUndefined(env.DB_PASSWORD),
-    databaseName: emptyToUndefined(env.DB_NAME),
-    cloudSqlConnectionName: emptyToUndefined(env.CLOUD_SQL_CONNECTION_NAME),
-    databaseSocketPath: emptyToUndefined(env.DATABASE_SOCKET_PATH),
+    databaseUrl,
+    databaseUser,
+    databasePassword,
+    databaseName,
+    cloudSqlConnectionName,
+    databaseSocketPath,
     corsOrigins: parseCsv(env.CORS_ORIGINS, defaultCorsOrigins),
     autoSeedDemo: parseBoolean("AUTO_SEED_DEMO", env.AUTO_SEED_DEMO, false),
     clusteringRadiusMeters: parseNumber("CLUSTERING_RADIUS_METERS", env.CLUSTERING_RADIUS_METERS, {
@@ -123,4 +138,29 @@ function emptyToUndefined(value: string | undefined) {
   }
 
   return value;
+}
+
+function validateDatabaseConfig(config: {
+  databaseUrl?: string;
+  databaseUser?: string;
+  databasePassword?: string;
+  databaseName?: string;
+  cloudSqlConnectionName?: string;
+  databaseSocketPath?: string;
+}) {
+  const basicValues = [config.databaseUser, config.databasePassword, config.databaseName];
+  const hasAnyBasicValue = basicValues.some(Boolean);
+  const hasAllBasicValues = basicValues.every(Boolean);
+  const hasAnySocketValue = Boolean(config.cloudSqlConnectionName || config.databaseSocketPath);
+  const hasAllSocketValues = Boolean(config.cloudSqlConnectionName && config.databaseSocketPath);
+
+  if (!config.databaseUrl && hasAnyBasicValue && !hasAllBasicValues) {
+    throw new Error("DB_USER, DB_PASSWORD, and DB_NAME must be provided together");
+  }
+
+  if (hasAnySocketValue && (!hasAllSocketValues || !hasAllBasicValues)) {
+    throw new Error(
+      "Cloud SQL socket configuration requires DB_USER, DB_PASSWORD, DB_NAME, CLOUD_SQL_CONNECTION_NAME, and DATABASE_SOCKET_PATH",
+    );
+  }
 }

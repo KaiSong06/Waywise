@@ -9,6 +9,8 @@ describe("loadEnv", () => {
       DB_USER: "waywise",
       DB_PASSWORD: "secret",
       DB_NAME: "waywise",
+      CLOUD_SQL_CONNECTION_NAME: "project:us-central1:waywise",
+      DATABASE_SOCKET_PATH: "/cloudsql",
       CORS_ORIGINS: "https://waywise.vercel.app,http://localhost:5173",
       AUTO_SEED_DEMO: "true",
       CLUSTERING_RADIUS_METERS: "18",
@@ -24,6 +26,8 @@ describe("loadEnv", () => {
       databaseUser: "waywise",
       databasePassword: "secret",
       databaseName: "waywise",
+      cloudSqlConnectionName: "project:us-central1:waywise",
+      databaseSocketPath: "/cloudsql",
       corsOrigins: ["https://waywise.vercel.app", "http://localhost:5173"],
       autoSeedDemo: true,
       clusteringRadiusMeters: 18,
@@ -49,6 +53,26 @@ describe("loadEnv", () => {
     expect(config.demoMode).toBe(false);
   });
 
+  it("accepts complete Cloud SQL socket settings without DATABASE_URL", () => {
+    const config = loadEnv({
+      NODE_ENV: "production",
+      DB_USER: "waywise",
+      DB_PASSWORD: "secret",
+      DB_NAME: "waywise",
+      CLOUD_SQL_CONNECTION_NAME: "project:us-central1:waywise",
+      DATABASE_SOCKET_PATH: "/cloudsql",
+    });
+
+    expect(config.databaseUrl).toBeUndefined();
+    expect(config).toMatchObject({
+      databaseUser: "waywise",
+      databasePassword: "secret",
+      databaseName: "waywise",
+      cloudSqlConnectionName: "project:us-central1:waywise",
+      databaseSocketPath: "/cloudsql",
+    });
+  });
+
   it("fails fast for invalid numeric values", () => {
     expect(() =>
       loadEnv({
@@ -63,5 +87,26 @@ describe("loadEnv", () => {
         CLUSTERING_RADIUS_METERS: "0",
       }),
     ).toThrow("CLUSTERING_RADIUS_METERS must be between 1 and 100");
+  });
+
+  it("fails fast for partial database configuration", () => {
+    expect(() =>
+      loadEnv({
+        NODE_ENV: "production",
+        DB_USER: "waywise",
+      }),
+    ).toThrow("DB_USER, DB_PASSWORD, and DB_NAME must be provided together");
+
+    expect(() =>
+      loadEnv({
+        NODE_ENV: "production",
+        DB_USER: "waywise",
+        DB_PASSWORD: "secret",
+        DB_NAME: "waywise",
+        CLOUD_SQL_CONNECTION_NAME: "project:us-central1:waywise",
+      }),
+    ).toThrow(
+      "Cloud SQL socket configuration requires DB_USER, DB_PASSWORD, DB_NAME, CLOUD_SQL_CONNECTION_NAME, and DATABASE_SOCKET_PATH",
+    );
   });
 });

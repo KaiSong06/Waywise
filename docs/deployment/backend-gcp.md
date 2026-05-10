@@ -71,7 +71,12 @@ MAX_GPS_ACCURACY_METERS=50
 
 `DATABASE_URL` is also supported for local or non-Cloud SQL deployments. For Cloud Run with
 Cloud SQL, prefer the Cloud SQL socket settings above and attach the Cloud SQL instance to the
-Cloud Run service.
+Cloud Run service. The socket configuration is all-or-nothing: set `DB_USER`, `DB_PASSWORD`,
+`DB_NAME`, `CLOUD_SQL_CONNECTION_NAME`, and `DATABASE_SOCKET_PATH` together.
+
+Use exact browser origins in `CORS_ORIGINS`. Non-browser calls and same-origin requests can still
+reach the API without an `Origin` header, but browsers from unlisted origins will not receive CORS
+allow headers.
 
 ## Demo Seeding
 

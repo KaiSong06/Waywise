@@ -62,7 +62,7 @@ export async function createApp(options: AppOptions = {}): Promise<FastifyInstan
         return;
       }
 
-      callback(new Error("Origin is not allowed by CORS"), false);
+      callback(null, false);
     },
   });
 
