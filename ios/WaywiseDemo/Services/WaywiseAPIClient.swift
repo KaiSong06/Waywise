@@ -1,11 +1,11 @@
 import Foundation
 
-struct HTTPTransportResponse {
+struct HTTPTransportResponse: Sendable {
     let data: Data
     let statusCode: Int
 }
 
-protocol HTTPTransport {
+protocol HTTPTransport: Sendable {
     func send(_ request: URLRequest) async throws -> HTTPTransportResponse
 }
 
@@ -24,7 +24,7 @@ struct URLSessionHTTPTransport: HTTPTransport {
     }
 }
 
-enum WaywiseAPIError: LocalizedError, Equatable {
+enum WaywiseAPIError: LocalizedError, Equatable, Sendable {
     case invalidBaseURL
     case invalidResponseStatus(Int)
 
@@ -38,7 +38,7 @@ enum WaywiseAPIError: LocalizedError, Equatable {
     }
 }
 
-struct WaywiseAPIClient {
+struct WaywiseAPIClient: Sendable {
     private let baseURL: URL
     private let transport: HTTPTransport
 
@@ -86,4 +86,3 @@ private extension URL {
         return URL(string: text) ?? self
     }
 }
-

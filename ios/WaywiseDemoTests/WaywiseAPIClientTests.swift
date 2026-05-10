@@ -36,7 +36,8 @@ final class WaywiseAPIClientTests: XCTestCase {
 
         let result = try await client.uploadImpactEvent(payload)
 
-        let request = try await XCTUnwrap(transport.recordedRequests.first)
+        let requests = await transport.recordedRequests
+        let request = try XCTUnwrap(requests.first)
         XCTAssertEqual(request.url?.absoluteString, "https://waywise-api.example.com/api/impact-events")
         XCTAssertEqual(request.httpMethod, "POST")
         XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
@@ -69,7 +70,7 @@ final class WaywiseAPIClientTests: XCTestCase {
     }
 }
 
-private final class RecordingTransport: HTTPTransport {
+private actor RecordingTransport: HTTPTransport {
     private(set) var recordedRequests: [URLRequest] = []
     private let response: HTTPTransportResponse
 
@@ -105,4 +106,3 @@ private extension ImpactEventPayload {
         )
     )
 }
-

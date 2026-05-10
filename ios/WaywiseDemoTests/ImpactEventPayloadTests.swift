@@ -33,7 +33,7 @@ final class ImpactEventPayloadTests: XCTestCase {
         XCTAssertEqual(payload.appVersion, "ios-demo-tests")
         XCTAssertEqual(payload.timestamp, "2026-05-10T14:32:00Z")
         XCTAssertGreaterThan(payload.impactMagnitude, 1.0)
-        XCTAssertEqual(payload.verticalAcceleration, 2.6, accuracy: 0.001)
+        XCTAssertEqual(try XCTUnwrap(payload.verticalAcceleration), 2.6, accuracy: 0.001)
         XCTAssertEqual(payload.sensorWindowSummary.sampleCount, 2)
         XCTAssertEqual(payload.sensorWindowSummary.peakMagnitude, payload.impactMagnitude, accuracy: 0.001)
     }
@@ -76,4 +76,3 @@ final class ImpactEventPayloadTests: XCTestCase {
         XCTAssertNil(object["gpsAccuracyMeters"])
     }
 }
-

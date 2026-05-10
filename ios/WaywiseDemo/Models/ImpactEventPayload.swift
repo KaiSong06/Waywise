@@ -1,6 +1,6 @@
 import Foundation
 
-struct LocationSnapshot: Equatable {
+struct LocationSnapshot: Equatable, Sendable {
     let latitude: Double
     let longitude: Double
     let speedMetersPerSecond: Double
@@ -8,7 +8,7 @@ struct LocationSnapshot: Equatable {
     let horizontalAccuracyMeters: Double?
 }
 
-struct MotionSample: Equatable {
+struct MotionSample: Equatable, Sendable {
     let timestamp: Date
     let x: Double
     let y: Double
@@ -19,14 +19,14 @@ struct MotionSample: Equatable {
     }
 }
 
-struct SensorWindowSummary: Codable, Equatable {
+struct SensorWindowSummary: Codable, Equatable, Sendable {
     let sampleCount: Int
     let peakMagnitude: Double
     let averageMagnitude: Double
     let recentMagnitudes: [Double]
 }
 
-struct ImpactEventPayload: Codable, Equatable {
+struct ImpactEventPayload: Codable, Equatable, Sendable {
     let vehicleId: String
     let driveSessionId: String
     let latitude: Double
@@ -42,7 +42,7 @@ struct ImpactEventPayload: Codable, Equatable {
     let sensorWindowSummary: SensorWindowSummary
 }
 
-struct ImpactUploadResult: Codable, Equatable {
+struct ImpactUploadResult: Codable, Equatable, Sendable {
     let accepted: Bool
     let eventId: String
     let candidateId: String?
@@ -71,4 +71,3 @@ extension ISO8601DateFormatter {
         return formatter
     }
 }
-

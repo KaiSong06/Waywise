@@ -1,6 +1,6 @@
 import Foundation
 
-struct ImpactEventBuilder {
+struct ImpactEventBuilder: Sendable {
     let appVersion: String
 
     func makePayload(
@@ -47,4 +47,3 @@ struct ImpactEventBuilder {
         )
     }
 }
-
