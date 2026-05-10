@@ -1,4 +1,5 @@
 import XCTest
+import UserNotifications
 @testable import WaywiseDemo
 
 final class WaywiseAPIClientTests: XCTestCase {
@@ -67,6 +68,20 @@ final class WaywiseAPIClientTests: XCTestCase {
         } catch let error as WaywiseAPIError {
             XCTAssertEqual(error.errorDescription, "Waywise API request failed with status 400")
         }
+    }
+}
+
+final class PotholeAlertNotificationTests: XCTestCase {
+    func testBuildsThirtySecondPotholeDetectedNotificationRequest() throws {
+        let request = PotholeDetectedNotification.makeRequest(delay: 30)
+
+        XCTAssertTrue(request.identifier.hasPrefix("waywise.pothole-detected."))
+        XCTAssertEqual(request.content.title, "Pothole detected")
+        XCTAssertEqual(request.content.body, "Waywise detected a likely pothole near your current route.")
+        XCTAssertNotNil(request.content.sound)
+        let trigger = try XCTUnwrap(request.trigger as? UNTimeIntervalNotificationTrigger)
+        XCTAssertEqual(trigger.timeInterval, 30, accuracy: 0.001)
+        XCTAssertFalse(trigger.repeats)
     }
 }
 

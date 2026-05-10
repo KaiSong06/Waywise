@@ -85,8 +85,36 @@ struct ContentView: View {
                 viewModel.stopDrive()
             }
             .buttonStyle(.bordered)
+
+            Divider()
+
+            Button {
+                Task {
+                    await viewModel.schedulePotholeAlert()
+                }
+            } label: {
+                Label("Schedule pothole alert", systemImage: "bell.badge.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .disabled(viewModel.notificationState == .scheduling)
+
+            Text(viewModel.notificationState.label)
+                .font(.caption)
+                .foregroundStyle(notificationStatusColor)
         }
         .panelStyle()
+    }
+
+    private var notificationStatusColor: Color {
+        switch viewModel.notificationState {
+        case .failed:
+            return .red
+        case .scheduled:
+            return .green
+        default:
+            return .secondary
+        }
     }
 
     private var uploadIcon: String {
@@ -133,4 +161,3 @@ private extension View {
 #Preview {
     ContentView()
 }
-
