@@ -67,3 +67,5 @@ project environment variables for the live demo. After Vercel creates the produc
 exact origin to the backend `CORS_ORIGINS` value.
 
 Detailed Vercel notes live in `docs/deployment/vercel-dashboard.md`.
+
+Use `docs/deployment/live-demo-checklist.md` immediately before recording or presenting.
