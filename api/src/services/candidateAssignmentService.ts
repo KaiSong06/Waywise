@@ -6,6 +6,7 @@ import {
   getCandidateEvidence,
   insertCandidate,
   linkCandidateEvent,
+  lockCandidateSearchArea,
   updateCandidateScore,
 } from "../repositories/candidatesRepository.js";
 import {
@@ -32,6 +33,12 @@ export function createCandidateAssignmentService(options: {
         if (!event || !event.accepted) {
           return {};
         }
+
+        await lockCandidateSearchArea(client, {
+          latitude: event.latitude,
+          longitude: event.longitude,
+          radiusMeters: options.config.clusteringRadiusMeters,
+        });
 
         const candidate = await findOrCreateCandidate(client, event, options.config.clusteringRadiusMeters);
         await linkCandidateEvent(client, {

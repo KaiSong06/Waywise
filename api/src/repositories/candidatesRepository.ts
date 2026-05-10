@@ -1,7 +1,10 @@
 import { randomUUID } from "node:crypto";
+import { lockTransactionAdvisoryKey } from "../db/advisoryLocks.js";
 import type { DbClient } from "../db/pool.js";
 import type { CandidateStatus, SeverityLevel } from "../db/schema.js";
 import type { CandidateEvidenceEvent, CandidateScore } from "../domain/candidate.js";
+
+const candidateClusterLockNamespace = 20_260_510;
 
 export interface CandidateRecord {
   id: string;
@@ -131,6 +134,17 @@ export async function findCandidateWithinRadius(
     ...mapCandidateRow(result.rows[0]),
     distanceMeters: Number(result.rows[0].distance_meters),
   };
+}
+
+export async function lockCandidateSearchArea(
+  client: DbClient,
+  input: { latitude: number; longitude: number; radiusMeters: number },
+): Promise<void> {
+  const lockKeys = candidateSearchAreaLockKeys(input);
+
+  for (const key of lockKeys) {
+    await lockTransactionAdvisoryKey(client, candidateClusterLockNamespace, key);
+  }
 }
 
 export async function listCandidates(client: DbClient): Promise<CandidateRecord[]> {
@@ -336,4 +350,35 @@ function mapCandidateRow(row: CandidateRow): CandidateRecord {
     status: row.status,
     lastScoredAt: row.last_scored_at,
   };
+}
+
+function candidateSearchAreaLockKeys(input: { latitude: number; longitude: number; radiusMeters: number }) {
+  const cellSizeMeters = Math.max(input.radiusMeters, 1);
+  const latitudeMeters = input.latitude * 111_320;
+  const longitudeMeters = input.longitude * Math.cos((input.latitude * Math.PI) / 180) * 111_320;
+  const originX = Math.floor(longitudeMeters / cellSizeMeters);
+  const originY = Math.floor(latitudeMeters / cellSizeMeters);
+  const keys = new Set<number>();
+
+  for (let xOffset = -1; xOffset <= 1; xOffset += 1) {
+    for (let yOffset = -1; yOffset <= 1; yOffset += 1) {
+      keys.add(hashCandidateCell(originX + xOffset, originY + yOffset));
+    }
+  }
+
+  return [...keys].sort((left, right) => left - right);
+}
+
+function hashCandidateCell(x: number, y: number) {
+  let hash = 0x811c9dc5;
+  hash = mixHash(hash, x);
+  hash = mixHash(hash, y);
+  return hash | 0;
+}
+
+function mixHash(hash: number, value: number) {
+  let mixed = hash ^ value;
+  mixed = Math.imul(mixed, 0x01000193);
+  mixed ^= value >> 16;
+  return mixed | 0;
 }

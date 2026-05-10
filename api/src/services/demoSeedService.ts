@@ -1,3 +1,4 @@
+import { hashAdvisoryLockKey, withSessionAdvisoryLock } from "../db/advisoryLocks.js";
 import type { DbPool } from "../db/pool.js";
 import type { DemoRunRecord } from "../repositories/demoRunsRepository.js";
 import {
@@ -8,6 +9,8 @@ import {
 import type { ImpactIngestionService } from "./impactIngestionService.js";
 import type { StatusWorkflowService } from "./statusWorkflowService.js";
 import { buildDemoSeedEvents, demoSyntheticSourceCount, demoTargetCount } from "../demo/demoSeedData.js";
+
+const demoSeedLockNamespace = 20_260_511;
 
 export interface DemoSeedResult {
   demoRunId: string;
@@ -42,62 +45,84 @@ export function createDemoSeedService(options: {
 
   return {
     async seedDemoFleet(seed = "default-demo") {
-      const existingRun = await demoRunsRepository.findCompletedDemoRunBySeed(seed);
+      const seedFleet = () => seedDemoFleetOnce(seed, demoRunsRepository, options);
 
-      if (existingRun) {
-        return {
-          demoRunId: existingRun.id,
-          alreadySeeded: true,
-          eventCount: existingRun.eventCount,
-          syntheticSourceCount: existingRun.syntheticSourceCount,
-          targetLocationsCount: existingRun.targetLocationsCount,
-        };
+      if (options.pool) {
+        return withSessionAdvisoryLock(
+          options.pool,
+          demoSeedLockNamespace,
+          hashAdvisoryLockKey(seed),
+          seedFleet,
+        );
       }
 
-      const seedEvents = buildDemoSeedEvents(seed);
-      const run = await demoRunsRepository.createDemoRun({
-        seed,
-        targetLocationsCount: demoTargetCount(),
-        syntheticSourceCount: demoSyntheticSourceCount(),
-        eventCount: seedEvents.length,
-      });
-      const candidateStatusTargets = new Map<string, (typeof seedEvents)[number]["status"]>();
-
-      try {
-        for (const seedEvent of seedEvents) {
-          const result = await options.impactIngestionService.ingestImpactEvent(seedEvent.event);
-
-          if (result.candidateId) {
-            candidateStatusTargets.set(result.candidateId, seedEvent.status);
-          }
-        }
-
-        for (const [candidateId, status] of candidateStatusTargets) {
-          await options.statusWorkflowService.updateStatus(candidateId, status, "demo seed");
-        }
-
-        await demoRunsRepository.finishDemoRun({
-          id: run.id,
-          status: "completed",
-        });
-
-        return {
-          demoRunId: run.id,
-          alreadySeeded: false,
-          eventCount: seedEvents.length,
-          syntheticSourceCount: demoSyntheticSourceCount(),
-          targetLocationsCount: demoTargetCount(),
-        };
-      } catch (error) {
-        await demoRunsRepository.finishDemoRun({
-          id: run.id,
-          status: "failed",
-          errorMessage: error instanceof Error ? error.message : "Unknown seed failure",
-        });
-        throw error;
-      }
+      return seedFleet();
     },
   };
+}
+
+async function seedDemoFleetOnce(
+  seed: string,
+  demoRunsRepository: DemoRunsRepository,
+  options: {
+    impactIngestionService: ImpactIngestionService;
+    statusWorkflowService: Pick<StatusWorkflowService, "updateStatus">;
+  },
+): Promise<DemoSeedResult> {
+  const existingRun = await demoRunsRepository.findCompletedDemoRunBySeed(seed);
+
+  if (existingRun) {
+    return {
+      demoRunId: existingRun.id,
+      alreadySeeded: true,
+      eventCount: existingRun.eventCount,
+      syntheticSourceCount: existingRun.syntheticSourceCount,
+      targetLocationsCount: existingRun.targetLocationsCount,
+    };
+  }
+
+  const seedEvents = buildDemoSeedEvents(seed);
+  const run = await demoRunsRepository.createDemoRun({
+    seed,
+    targetLocationsCount: demoTargetCount(),
+    syntheticSourceCount: demoSyntheticSourceCount(),
+    eventCount: seedEvents.length,
+  });
+  const candidateStatusTargets = new Map<string, (typeof seedEvents)[number]["status"]>();
+
+  try {
+    for (const seedEvent of seedEvents) {
+      const result = await options.impactIngestionService.ingestImpactEvent(seedEvent.event);
+
+      if (result.candidateId) {
+        candidateStatusTargets.set(result.candidateId, seedEvent.status);
+      }
+    }
+
+    for (const [candidateId, status] of candidateStatusTargets) {
+      await options.statusWorkflowService.updateStatus(candidateId, status, "demo seed");
+    }
+
+    await demoRunsRepository.finishDemoRun({
+      id: run.id,
+      status: "completed",
+    });
+
+    return {
+      demoRunId: run.id,
+      alreadySeeded: false,
+      eventCount: seedEvents.length,
+      syntheticSourceCount: demoSyntheticSourceCount(),
+      targetLocationsCount: demoTargetCount(),
+    };
+  } catch (error) {
+    await demoRunsRepository.finishDemoRun({
+      id: run.id,
+      status: "failed",
+      errorMessage: error instanceof Error ? error.message : "Unknown seed failure",
+    });
+    throw error;
+  }
 }
 
 function createPgDemoRunsRepository(pool: DbPool | undefined): DemoRunsRepository {
