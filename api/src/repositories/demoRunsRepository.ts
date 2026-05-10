@@ -33,6 +33,29 @@ export async function createDemoRun(
   return mapDemoRunRow(result.rows[0]);
 }
 
+export async function findCompletedDemoRunBySeed(
+  client: DbClient,
+  seed: string,
+): Promise<DemoRunRecord | null> {
+  const result = await client.query<DemoRunRow>(
+    `
+      SELECT *
+      FROM demo_runs
+      WHERE seed = $1
+        AND status = 'completed'
+      ORDER BY ended_at DESC NULLS LAST, started_at DESC
+      LIMIT 1
+    `,
+    [seed],
+  );
+
+  if (result.rowCount === 0) {
+    return null;
+  }
+
+  return mapDemoRunRow(result.rows[0]);
+}
+
 export async function finishDemoRun(
   client: DbClient,
   input: { id: string; status: "completed" | "failed"; errorMessage?: string },

@@ -141,6 +141,59 @@ export async function listCandidates(client: DbClient): Promise<CandidateRecord[
   return result.rows.map(mapCandidateRow);
 }
 
+export async function getCandidateById(client: DbClient, id: string): Promise<CandidateRecord | null> {
+  const result = await client.query<CandidateRow>("SELECT * FROM pothole_candidates WHERE id = $1", [id]);
+
+  if (result.rowCount === 0) {
+    return null;
+  }
+
+  return mapCandidateRow(result.rows[0]);
+}
+
+export async function updateCandidateStatus(
+  client: DbClient,
+  id: string,
+  status: CandidateStatus,
+): Promise<{ id: string; previousStatus: CandidateStatus; status: CandidateStatus } | null> {
+  const result = await client.query<{
+    id: string;
+    previous_status: CandidateStatus;
+    status: CandidateStatus;
+  }>(
+    `
+      WITH existing AS (
+        SELECT id, status AS previous_status
+        FROM pothole_candidates
+        WHERE id = $1
+      ),
+      updated AS (
+        UPDATE pothole_candidates
+        SET status = $2,
+          updated_at = now()
+        WHERE id = $1
+        RETURNING id, status
+      )
+      SELECT updated.id, existing.previous_status, updated.status
+      FROM updated
+      JOIN existing ON existing.id = updated.id
+    `,
+    [id, status],
+  );
+
+  const row = result.rows[0];
+
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    previousStatus: row.previous_status,
+    status: row.status,
+  };
+}
+
 export async function linkCandidateEvent(
   client: DbClient,
   input: { candidateId: string; eventId: string },
