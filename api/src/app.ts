@@ -72,6 +72,12 @@ export async function createApp(options: AppOptions = {}): Promise<FastifyInstan
   await registerRecalculateCandidateRoutes(app, candidateAssignmentService);
   await registerDemoRoutes(app, demoSeedService);
 
+  if (config.autoSeedDemo) {
+    app.addHook("onReady", async () => {
+      await demoSeedService.seedDemoFleet("auto-demo");
+    });
+  }
+
   app.addHook("onClose", async () => {
     if (!options.pool) {
       await pool.end();

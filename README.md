@@ -48,6 +48,15 @@ npm run api:test
 npm run api:build
 ```
 
+For local PostGIS-backed integration tests:
+
+```bash
+docker compose -f api/docker-compose.yml up -d
+TEST_DATABASE_URL=postgres://waywise:waywise@localhost:54329/waywise npm run api:test
+```
+
+Backend deployment notes live in `docs/deployment/backend-gcp.md`.
+
 ## Vercel
 
 Deploy the repo as a Vite app. Configure `VITE_MAPBOX_TOKEN` in Vercel project environment
