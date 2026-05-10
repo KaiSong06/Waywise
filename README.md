@@ -57,10 +57,13 @@ docker compose -f api/docker-compose.yml up -d
 TEST_DATABASE_URL=postgres://waywise:waywise@localhost:54329/waywise npm run api:test
 ```
 
-Backend deployment notes live in `docs/deployment/backend-gcp.md`.
+Backend deployment notes live in `docs/deployment/backend-gcp.md` and the full GCP runbook lives
+in `docs/deployment/live-demo-gcp.md`.
 
 ## Vercel
 
 Deploy the repo as a Vite app. Configure `VITE_MAPBOX_TOKEN` and `VITE_API_BASE_URL` in Vercel
 project environment variables for the live demo. After Vercel creates the production URL, add that
 exact origin to the backend `CORS_ORIGINS` value.
+
+Detailed Vercel notes live in `docs/deployment/vercel-dashboard.md`.
