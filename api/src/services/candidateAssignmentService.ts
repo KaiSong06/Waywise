@@ -1,5 +1,5 @@
 import type { ApiConfig } from "../config/env.js";
-import type { DbPool } from "../db/pool.js";
+import type { DbClient, DbPool } from "../db/pool.js";
 import { withTransaction } from "../db/transaction.js";
 import {
   findCandidateWithinRadius,
@@ -24,7 +24,7 @@ export function createCandidateAssignmentService(options: {
   pool: DbPool;
   config: Pick<ApiConfig, "clusteringRadiusMeters">;
 }): CandidateAssignmentService {
-  return {
+  const service: CandidateAssignmentService = {
     async assignEvent(eventId: string) {
       return withTransaction(options.pool, async (client) => {
         const event = await findImpactEventById(client, eventId);
@@ -57,7 +57,7 @@ export function createCandidateAssignmentService(options: {
       let assignedEventCount = 0;
 
       for (const event of events) {
-        const result = await this.assignEvent(event.id);
+        const result = await service.assignEvent(event.id);
 
         if (result.candidateId) {
           assignedEventCount += 1;
@@ -67,10 +67,12 @@ export function createCandidateAssignmentService(options: {
       return { assignedEventCount };
     },
   };
+
+  return service;
 }
 
 async function findOrCreateCandidate(
-  client: DbPool | Parameters<typeof findCandidateWithinRadius>[0],
+  client: DbClient,
   event: ImpactEventRecord,
   radiusMeters: number,
 ) {
@@ -87,7 +89,21 @@ async function findOrCreateCandidate(
   return insertCandidate(client, {
     latitude: event.latitude,
     longitude: event.longitude,
+    address: extractAddress(event.sensorWindowSummary),
     firstDetectedAt: event.occurredAt,
     lastDetectedAt: event.occurredAt,
   });
+}
+
+function extractAddress(sensorWindowSummary: unknown) {
+  if (
+    sensorWindowSummary &&
+    typeof sensorWindowSummary === "object" &&
+    "target" in sensorWindowSummary &&
+    typeof sensorWindowSummary.target === "string"
+  ) {
+    return sensorWindowSummary.target;
+  }
+
+  return undefined;
 }

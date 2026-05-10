@@ -58,8 +58,7 @@ export function createStatusWorkflowService(
     };
   }
 
-  const repositories =
-    options;
+  const repositories = options;
 
   return {
     async updateStatus(id, status, note) {
