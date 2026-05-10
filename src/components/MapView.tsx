@@ -18,7 +18,10 @@ const severityColors = {
 export function MapView({ candidates, featureCollection, selectedId, onSelect }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapboxMap | null>(null);
+  const latestFeatureCollectionRef = useRef(featureCollection);
   const token = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
+
+  latestFeatureCollectionRef.current = featureCollection;
 
   const fallbackPins = useMemo(
     () =>
@@ -63,7 +66,7 @@ export function MapView({ candidates, featureCollection, selectedId, onSelect }:
       map.on("load", () => {
         map.addSource("pothole-candidates", {
           type: "geojson",
-          data: featureCollection,
+          data: latestFeatureCollectionRef.current,
         });
 
         map.addLayer({
@@ -149,13 +152,28 @@ export function MapView({ candidates, featureCollection, selectedId, onSelect }:
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [featureCollection, onSelect, selectedId, token]);
+  }, [onSelect, token]);
 
   useEffect(() => {
     const source = mapRef.current?.getSource("pothole-candidates") as GeoJSONSource | undefined;
 
     source?.setData(featureCollection);
   }, [featureCollection]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map?.getLayer("candidate-circles")) {
+      return;
+    }
+
+    map.setPaintProperty("candidate-circles", "circle-stroke-width", [
+      "case",
+      ["==", ["get", "id"], selectedId],
+      3,
+      1,
+    ]);
+  }, [selectedId]);
 
   if (!token) {
     return (
