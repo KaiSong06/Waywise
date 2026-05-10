@@ -31,6 +31,23 @@ npm test
 npm run build
 ```
 
+## Backend API
+
+The backend lives in `api/` as a separate Fastify/TypeScript service for the Cloud Run
+deployment.
+
+```bash
+npm install --prefix api
+npm run api:dev
+```
+
+Useful backend checks:
+
+```bash
+npm run api:test
+npm run api:build
+```
+
 ## Vercel
 
 Deploy the repo as a Vite app. Configure `VITE_MAPBOX_TOKEN` in Vercel project environment
