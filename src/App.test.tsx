@@ -16,7 +16,7 @@ describe("App", () => {
     expect(screen.getByText("Active candidates")).toBeInTheDocument();
     expect(screen.getByText("Avg. confidence")).toBeInTheDocument();
     expect(screen.getByLabelText("Minimum confidence")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /Queen St W & Spadina Ave/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /Victoria Pr S 401 C W Ramp/i }).length).toBeGreaterThan(0);
     expect(screen.getByText("Candidate details")).toBeInTheDocument();
     expect(screen.getByText("Unique sources")).toBeInTheDocument();
   });
@@ -28,17 +28,17 @@ describe("App", () => {
       target: { value: "80" },
     });
 
-    expect(screen.getAllByText("Queen St W & Spadina Ave").length).toBeGreaterThan(0);
-    expect(screen.queryByText("College St & Ossington Ave")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Highway 27 S & Steeles Ave W").length).toBeGreaterThan(0);
+    expect(screen.queryByText("M1E postal area")).not.toBeInTheDocument();
   });
 
   it("selects a candidate and updates its local status", () => {
     render(<App />);
 
-    fireEvent.click(screen.getAllByRole("button", { name: /Dundas St W & Bathurst St/i })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: /Dundas St E & Mutual St/i })[0]);
 
     const detailPanel = screen.getByLabelText("Selected candidate details");
-    expect(within(detailPanel).getByRole("heading", { name: "Dundas St W & Bathurst St" })).toBeInTheDocument();
+    expect(within(detailPanel).getByRole("heading", { name: "Dundas St E & Mutual St" })).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Current status"), {
       target: { value: "verified" },
