@@ -15,8 +15,8 @@ export interface PotholeCandidate {
   eventCount: number;
   averageImpactMagnitude: number;
   peakImpactMagnitude: number;
-  firstDetectedAt: string;
-  lastDetectedAt: string;
+  firstDetectedAt: string | null;
+  lastDetectedAt: string | null;
   status: CandidateStatus;
 }
 
@@ -61,6 +61,10 @@ export function filterCandidates(
 
     if (filters.lastDetectedWithinHours === "all") {
       return true;
+    }
+
+    if (!candidate.lastDetectedAt) {
+      return false;
     }
 
     const lastDetected = new Date(candidate.lastDetectedAt).getTime();

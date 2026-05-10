@@ -88,6 +88,7 @@ describe("App", () => {
     mockFetchSequence(
       jsonResponse(featureCollection([apiCandidate()])),
       jsonResponse({ id: "candidate-1", status: "assigned" }),
+      jsonResponse(featureCollection([apiCandidate({ status: "assigned" })])),
     );
 
     render(<App />);
@@ -101,6 +102,25 @@ describe("App", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Current status")).toHaveValue("assigned");
     });
+  });
+
+  it("refreshes live candidates after a status change changes filter visibility", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.test");
+    mockFetchSequence(
+      jsonResponse(featureCollection([apiCandidate()])),
+      jsonResponse({ id: "candidate-1", status: "repaired" }),
+      jsonResponse(featureCollection([])),
+    );
+
+    render(<App />);
+
+    await screen.findByText("Live API connected");
+
+    fireEvent.change(screen.getByLabelText("Current status"), {
+      target: { value: "repaired" },
+    });
+
+    expect(await screen.findByText("No pothole candidates available.")).toBeInTheDocument();
   });
 
   it("shows a live API error without silently falling back to fixtures", async () => {

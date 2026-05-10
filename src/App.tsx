@@ -175,7 +175,14 @@ export default function App() {
     try {
       setApiError(null);
       const result = await apiClient.updateCandidateStatus(selectedCandidate.id, status);
-      setCandidates((current) => updateCandidateStatus(current, result.id, result.status));
+      const nextCandidates = await apiClient.listMapCandidates(filters);
+
+      setCandidates(nextCandidates);
+      setSelectedId(
+        nextCandidates.some((candidate) => candidate.id === result.id)
+          ? result.id
+          : (nextCandidates[0]?.id ?? ""),
+      );
       setApiState("connected");
     } catch (error) {
       setApiState("error");
